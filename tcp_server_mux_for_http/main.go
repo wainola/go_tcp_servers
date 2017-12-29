@@ -6,8 +6,17 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"strings"
+	"text/template"
 )
+
+// Inicializacion de templates.
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.ParseFiles("templates/index.html"))
+}
 
 func main() {
 	listen, err := net.Listen("tcp", ":8080")
@@ -45,15 +54,28 @@ func request(conexion net.Conn) {
 	for scanner.Scan() {
 		linea := scanner.Text()
 		if i == 0 {
-			fmt.Println(linea)
 			// Obtenemos la url y el metodo
 			method := strings.Fields(linea)[0]
-			fmt.Println(method)
+			url := strings.Fields(linea)[1]
+			fmt.Println("#### METHOD: ", method)
+			fmt.Println("#### URL: ", url)
+			mux(url, method, conexion)
 		}
-		// fin del request romper bucle
+		// fin del request romper bucle. El objetivo es que, enviada la data, hacer el retorno del request como se haria en una rest api normal
 		if linea == "" {
 			break
 		}
 		i++
+	}
+}
+
+func mux(url string, method string, conexion net.Conn) {
+	// Aca se lleva a cabo la logica de programacion.
+	if method == "GET" && url == "/" {
+		fmt.Println("Index request")
+		t := tpl.ExecuteTemplate(os.Stdout, "index.html", nil)
+		if t != nil {
+			log.Fatal(t)
+		}
 	}
 }
