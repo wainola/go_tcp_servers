@@ -45,10 +45,12 @@ func request(connexion net.Conn) {
 	scanner := bufio.NewScanner(connexion)
 	for scanner.Scan() {
 		linea := scanner.Text()
-		fmt.Println(linea)
+		//log.Println(linea)
 		if i == 0 {
 			m := strings.Fields(linea)[0]
+			url := strings.Fields(linea)[1]
 			fmt.Println("****METHOD", m)
+			fmt.Printf("URL INGRESADA ES: %v", url)
 		}
 		if linea == "" {
 			break
